@@ -1,107 +1,148 @@
-#include <sys/utsname.h>
-#include <fstream>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <unistd.h>
+#include <cstring>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
 
-
-static std::string ParseValue(const std::string& line) {
-    size_t pos = line.find('=');
-    if (pos == std::string::npos) return "";
-    std::string value = line.substr(pos + 1);
-    if (!value.empty() && value.front() == '"') value.erase(0, 1);
-    if (!value.empty() && value.back() == '"') value.pop_back();
-    return value;
-}
-
-
-class DistroInfo {
-public:
-    virtual ~DistroInfo() = 0;
-    virtual int GetDistroInfo() = 0;
-
-
+// ============================================================================
+// Структура: данные одного сетевого интерфейса
+// ============================================================================
+struct NetworkInterface {
+    std::string name;
+    std::string ipv4;
+    std::string mac;
 };
 
-class DistroInfoImpl : public DistroInfo {
+// ============================================================================
+// Класс: получение системной информации (hostname)
+// ============================================================================
+class HostnameInfo {
 public:
-    std::string GetName() const {
-        return distro_name_;
+    static std::string GetHostname() {
+        char hostname[256] = {0};
+        if (gethostname(hostname, sizeof(hostname)) == 0) {
+            return hostname;
+        }
+        return "unknown";
     }
-
-    std::string GetVersion() const {
-        return distro_version_;
-    }
-protected:
-    std::string distro_name_{};
-    std::string distro_version_{};
 };
 
-class OsReleaseDistroInfo : public DistroInfoImpl {
+// ============================================================================
+// Класс: получение сетевой информации (IP, MAC)
+// ============================================================================
+class NetworkInfo {
 public:
-    ~OsReleaseDistroInfo() override = default;
+    NetworkInfo() = default;
 
-    int GetDistroInfo() override {
-        std::ifstream file(kOsReleasePath_);
-        if (!file.is_open()) {
+    // Собрать данные обо всех интерфейсах
+    // Возврат: 0 — успех, 1 — ошибка
+    int GetNetInfo() {
+        interfaces_.clear();
+        std::map<std::string, NetworkInterface> iface_map;
+
+        ifaddrs* ifaddr = nullptr;
+        if (getifaddrs(&ifaddr) == -1) {
             return 1;
         }
-        std::string line;
-        while (std::getline(file, line)) {
-            if (line.find("PRETTY_NAME=") == 0 || line.find("NAME=") == 0) {
-                distro_name_ = ParseValue(line);
+
+        // Сокет для ioctl (MAC-адрес)
+        int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+
+        for (ifaddrs* ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+            if (!ifa->ifa_name) continue;
+
+            const std::string name = ifa->ifa_name;
+
+            // Создаём запись, если интерфейс ещё не встречался
+            if (iface_map.find(name) == iface_map.end()) {
+                iface_map[name] = {name, "", ""};
             }
-            if (line.find("VERSION_ID=") == 0) {
-                distro_version_ = ParseValue(line);
+            auto& iface = iface_map[name];
+
+            // MAC-адрес через ioctl (только один раз на интерфейс)
+            if (sock >= 0 && iface.mac.empty()) {
+                ifreq ifr{};
+                std::strncpy(ifr.ifr_name, name.c_str(), IFNAMSIZ - 1);
+                if (ioctl(sock, SIOCGIFHWADDR, &ifr) == 0) {
+                    unsigned char* hw = reinterpret_cast<unsigned char*>(ifr.ifr_hwaddr.sa_data);
+                    char mac_buf[18];
+                    std::snprintf(mac_buf, sizeof(mac_buf),
+                                  "%02X:%02X:%02X:%02X:%02X:%02X",
+                                  hw[0], hw[1], hw[2], hw[3], hw[4], hw[5]);
+                    iface.mac = mac_buf;
+                }
             }
-            if (!distro_name_.empty() && !distro_version_.empty()) {
-                break;
+
+            // IPv4-адрес (обрабатываем только AF_INET)
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET) {
+                char buf[INET_ADDRSTRLEN];
+                auto* sin = reinterpret_cast<sockaddr_in*>(ifa->ifa_addr);
+                if (inet_ntop(AF_INET, &sin->sin_addr, buf, sizeof(buf))) {
+                    iface.ipv4 = buf;
+                }
             }
         }
-        return 0;
+
+        if (sock >= 0) close(sock);
+        freeifaddrs(ifaddr);
+
+        // Конвертируем map в vector, оставляем только интерфейсы с данными
+        for (auto& [name, iface] : iface_map) {
+            if (!iface.ipv4.empty() || !iface.mac.empty()) {
+                interfaces_.push_back(iface);
+            }
+        }
+
+        return interfaces_.empty() ? 1 : 0;
     }
 
-private:
-    const std::string kOsReleasePath_ = "/etc/os-release";
-};
+    const std::vector<NetworkInterface>& GetInterfaces() const {
+        return interfaces_;
+    }
 
-class OSInfo {
-public:
-    OSInfo() = default;
-    ~OSInfo() = default;
-
-    int GetOsInfo() {
-        // uname()
-        utsname info{};
-        if (uname(&info) == 0) {
-            architecture_ = info.machine;
+    const NetworkInterface* FindByName(const std::string& name) const {
+        for (const auto& iface : interfaces_) {
+            if (iface.name == name) return &iface;
         }
+        return nullptr;
+    }
 
-
-
-        return 0;
+    const NetworkInterface* GetPrimary() const {
+        for (const auto& iface : interfaces_) {
+            if (iface.name != "lo") return &iface;
+        }
+        return interfaces_.empty() ? nullptr : &interfaces_[0];
     }
 
     void Print() const {
-        std::cout << "=== Информация об ОС ===" << std::endl;
-        std::cout << "Дистрибутив: " << distro_name_ << std::endl;
-        std::cout << "Версия: " << distro_version_ << std::endl;
-        std::cout << "Архитектура: " << architecture_ << std::endl;
+        std::cout << "Hostname: " << HostnameInfo::GetHostname() << std::endl;
+        for (const auto& iface : interfaces_) {
+            std::cout << "Interface: " << iface.name << std::endl;
+            if (!iface.ipv4.empty()) std::cout << "  IP:  " << iface.ipv4 << std::endl;
+            if (!iface.mac.empty())  std::cout << "  MAC: " << iface.mac << std::endl;
+        }
     }
 
 private:
-
-
-private:
-    std::string distro_name_{};
-    std::string distro_version_{};
-    std::string architecture_{};
-
-    const std::string kDebianVersion = "/etc/debian_version";
+    std::vector<NetworkInterface> interfaces_;
 };
 
+// ============================================================================
+// Entry point
+// ============================================================================
 int main() {
-    OSInfo os;
-    os.GetOsInfo();
-    os.Print();
+    NetworkInfo net;
+    if (net.GetNetInfo() != 0) {
+        std::cerr << "Failed to collect network info" << std::endl;
+        return 1;
+    }
+    net.Print();
     return 0;
 }
