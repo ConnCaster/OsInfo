@@ -1,0 +1,179 @@
+{
+    "audio": [
+        {
+            "bus": "PCI",
+            "description": "Audio device",
+            "driver": "snd_hda_intel",
+            "name": "card0",
+            "product": "GK208 HDMI/DP Audio Controller",
+            "type": "HDMI/DP",
+            "vendor": "NVIDIA Corporation"
+        },
+        {
+            "bus": "USB",
+            "description": "Audio device",
+            "driver": "usbhid",
+            "name": "card4",
+            "product": "C-Media Electronics Inc. USB Audio Device",
+            "type": "USB Audio",
+            "vendor": "C-Media Electronics Inc."
+        },
+        {
+            "bus": "PCI",
+            "description": "Audio device",
+            "driver": "snd_hda_intel",
+            "name": "card1",
+            "product": "Radeon High Definition Audio Controller",
+            "type": "Analog",
+            "vendor": "Advanced Micro Devices, Inc. [AMD/ATI]"
+        },
+        {
+            "bus": "PCI",
+            "description": "Audio device",
+            "driver": "snd_hda_intel",
+            "name": "card2",
+            "product": "Ryzen HD Audio Controller",
+            "type": "Analog",
+            "vendor": "Advanced Micro Devices, Inc. [AMD]"
+        }
+    ],
+    "cpu": {
+        "cores": 8,
+        "model": "AMD Ryzen 7 7700 8-Core Processor",
+        "threads": 16
+    },
+    "display": [
+        {
+            "depth": "32",
+            "driver": "nouveau",
+            "memory": "",
+            "name": "/dev/fb1",
+            "product": "GK208B [GeForce GT 710]",
+            "resolution": "2560,1440",
+            "vendor": "NVIDIA Corporation"
+        },
+        {
+            "depth": "32",
+            "driver": "amdgpu",
+            "memory": "",
+            "name": "/dev/fb0",
+            "product": "Raphael",
+            "resolution": "2560,1440",
+            "vendor": "Advanced Micro Devices, Inc. [AMD/ATI]"
+        }
+    ],
+    "memory": {
+        "modules": [
+            {
+                "description": "[empty]",
+                "is_empty": true,
+                "product": "Unknown",
+                "serial": "Unknown",
+                "size_bytes": 0,
+                "size_formatted": "",
+                "slot": "DIMM 0",
+                "vendor": "Unknown"
+            },
+            {
+                "description": "DIMM Synchronous Unbuffered (Unregistered) 4800 MHz (0,2 ns)",
+                "is_empty": false,
+                "product": "KF552C40-16",
+                "serial": "6F128246",
+                "size_bytes": 17179869184,
+                "size_formatted": "16.00 GB",
+                "slot": "DIMM 1",
+                "vendor": "Kingston"
+            },
+            {
+                "description": "[empty]",
+                "is_empty": true,
+                "product": "Unknown",
+                "serial": "Unknown",
+                "size_bytes": 0,
+                "size_formatted": "",
+                "slot": "DIMM 0",
+                "vendor": "Unknown"
+            },
+            {
+                "description": "DIMM Synchronous Unbuffered (Unregistered) 4800 MHz (0,2 ns)",
+                "is_empty": false,
+                "product": "KF552C40-16",
+                "serial": "C7028234",
+                "size_bytes": 17179869184,
+                "size_formatted": "16.00 GB",
+                "slot": "DIMM 1",
+                "vendor": "Kingston"
+            }
+        ],
+        "slots_total": 4,
+        "slots_used": 2,
+        "total": "32.00 GB"
+    },
+    "network": [
+        {
+            "description": "Ethernet interface",
+            "driver": "r8169",
+            "ip_address": "192.168.131.172",
+            "link": "yes",
+            "mac_address": "08:bf:b8:40:51:cb",
+            "name": "eno1",
+            "product": "RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller",
+            "speed": "1Gbit/s",
+            "vendor": "Realtek Semiconductor Co., Ltd."
+        }
+    ],
+    "storage": [
+        {
+            "driver": "",
+            "filesystem": "",
+            "mount_point": "",
+            "name": "/dev/ng0n1",
+            "product": "Unknown",
+            "serial": "Unknown",
+            "size_bytes": 0,
+            "size_formatted": "N/A",
+            "state": "",
+            "type": "NVMe disk",
+            "vendor": "Unknown"
+        },
+        {
+            "driver": "",
+            "filesystem": "ext4",
+            "mount_point": "/run/media/user/be9d806d-d030-4e6c-9df1-539c6d93d576",
+            "name": "/dev/nvme0n1",
+            "product": "Unknown",
+            "serial": "Unknown",
+            "size_bytes": 500107862016,
+            "size_formatted": "465.76 GB",
+            "state": "",
+            "type": "NVMe disk",
+            "vendor": "Unknown"
+        },
+        {
+            "driver": "",
+            "filesystem": "ext4",
+            "mount_point": "/",
+            "name": "/dev/sda",
+            "product": "TOSHIBA HDWD110",
+            "serial": "Z2EV301NS",
+            "size_bytes": 1000204886016,
+            "size_formatted": "931.51 GB",
+            "state": "",
+            "type": "ATA Disk",
+            "vendor": "Western Digital"
+        }
+    ],
+    "system": {
+        "bios": {
+            "date": "02/04/2024",
+            "version": "2413"
+        },
+        "hostname": "manjaro",
+        "kernel": "6.12.73-1-MANJARO",
+        "motherboard": {
+            "product": "System Product Name (SKU)",
+            "vendor": "ASUS"
+        },
+        "os": "Manjaro Linux"
+    }
+}

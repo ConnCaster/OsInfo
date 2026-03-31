@@ -1,0 +1,148 @@
+{
+    "audio": [
+        {
+            "description": "Audio device",
+            "name": "card0",
+            "product": "GK208 HDMI/DP Audio Controller",
+            "type": "HDMI/DP",
+            "vendor": "NVIDIA Corporation"
+        },
+        {
+            "description": "Audio device",
+            "name": "card4",
+            "product": "C-Media Electronics Inc. USB Audio Device",
+            "type": "USB Audio",
+            "vendor": "C-Media Electronics Inc."
+        },
+        {
+            "description": "Audio device",
+            "name": "card1",
+            "product": "Radeon High Definition Audio Controller",
+            "type": "Analog",
+            "vendor": "Advanced Micro Devices, Inc. [AMD/ATI]"
+        },
+        {
+            "description": "Audio device",
+            "name": "card2",
+            "product": "Ryzen HD Audio Controller",
+            "type": "Analog",
+            "vendor": "Advanced Micro Devices, Inc. [AMD]"
+        }
+    ],
+    "cpu": {
+        "cores": 8,
+        "model": "AMD Ryzen 7 7700 8-Core Processor",
+        "threads": 16
+    },
+    "display": [
+        {
+            "depth": "32",
+            "driver": "nouveau",
+            "memory": "",
+            "name": "/dev/fb1",
+            "product": "GK208B [GeForce GT 710]",
+            "resolution": "2560,1440",
+            "vendor": "NVIDIA Corporation"
+        },
+        {
+            "depth": "32",
+            "driver": "amdgpu",
+            "memory": "",
+            "name": "/dev/fb0",
+            "product": "Raphael",
+            "resolution": "2560,1440",
+            "vendor": "Advanced Micro Devices, Inc. [AMD/ATI]"
+        }
+    ],
+    "memory": {
+        "modules": [
+            {
+                "is_empty": true,
+                "product": "Unknown",
+                "serial": "Unknown",
+                "size_bytes": 0,
+                "size_formatted": "",
+                "slot": "DIMM 0",
+                "vendor": "Unknown"
+            },
+            {
+                "is_empty": false,
+                "product": "KF552C40-16",
+                "serial": "6F128246",
+                "size_bytes": 17179869184,
+                "size_formatted": "16.00 GB",
+                "slot": "DIMM 1",
+                "vendor": "Kingston"
+            },
+            {
+                "is_empty": true,
+                "product": "Unknown",
+                "serial": "Unknown",
+                "size_bytes": 0,
+                "size_formatted": "",
+                "slot": "DIMM 0",
+                "vendor": "Unknown"
+            },
+            {
+                "is_empty": false,
+                "product": "KF552C40-16",
+                "serial": "C7028234",
+                "size_bytes": 17179869184,
+                "size_formatted": "16.00 GB",
+                "slot": "DIMM 1",
+                "vendor": "Kingston"
+            }
+        ],
+        "slots_total": 4,
+        "slots_used": 2,
+        "total": "32.00 GB"
+    },
+    "network": [
+        {
+            "description": "Ethernet interface",
+            "name": "eno1",
+            "product": "RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller",
+            "speed": "1Gbit/s",
+            "vendor": "Realtek Semiconductor Co., Ltd."
+        }
+    ],
+    "storage": [
+        {
+            "filesystem": "",
+            "mount_point": "",
+            "name": "/dev/ng0n1",
+            "product": "Unknown",
+            "serial": "Unknown",
+            "size_bytes": 0,
+            "size_formatted": "N/A",
+            "type": "NVMe disk",
+            "vendor": "Unknown"
+        },
+        {
+            "filesystem": "ext4",
+            "mount_point": "/run/media/user/be9d806d-d030-4e6c-9df1-539c6d93d576",
+            "name": "/dev/nvme0n1",
+            "product": "Unknown",
+            "serial": "Unknown",
+            "size_bytes": 500107862016,
+            "size_formatted": "465.76 GB",
+            "type": "NVMe disk",
+            "vendor": "Unknown"
+        },
+        {
+            "filesystem": "ext4",
+            "mount_point": "/",
+            "name": "/dev/sda",
+            "product": "TOSHIBA HDWD110",
+            "serial": "Z2EV301NS",
+            "size_bytes": 1000204886016,
+            "size_formatted": "931.51 GB",
+            "type": "ATA Disk",
+            "vendor": "Western Digital"
+        }
+    ],
+    "motherboard": {
+        "product": "System Product Name (SKU)",
+        "vendor": "ASUS"
+    }
+}
