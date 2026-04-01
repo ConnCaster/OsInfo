@@ -17,6 +17,7 @@ struct HardwareSummary {
     std::vector<std::string> network; // ["name: Product, Vendor, Speed, Desc", ...]
     std::vector<std::string> display; // ["name: Product, Vendor, Res, Driver", ...]
     std::vector<std::string> storage; // ["name: Product, Vendor, Size, Type, FS", ...]
+    std::vector<std::string> usb;
 };
 
 // ============================================================================
@@ -29,7 +30,8 @@ void to_json(json &j, const HardwareSummary &s) {
         {"memory", s.memory},
         {"network", s.network},
         {"display", s.display},
-        {"storage", s.storage}
+        {"storage", s.storage},
+        {"usb", s.usb}
     };
 }
 
@@ -205,6 +207,50 @@ private:
                 summary_.storage.push_back(
                     logicalname + ": " + product + ", " + vendor + ", " + serial + ", " +
                     size_fmt + ", ATA Disk, " + filesystem);
+            }
+        }
+        // === Storage: SCSI Disk (аналогично ATA, но ищем описание "SCSI Disk") ===
+        else if (cls == "disk" && node.value("description", "").find("SCSI Disk") != std::string::npos) {
+            std::string logicalname = GetStringField(node, "logicalname");
+            unsigned long long size = GetNumericValue<unsigned long long>(node, "size", 0);
+
+            if (!logicalname.empty() && logicalname.find("hwmon") == std::string::npos && size > 0) {
+                std::string product = node.value("product", "Unknown");
+                std::string vendor = node.value("vendor", "Unknown");
+                std::string serial = node.value("serial", "Unknown");
+                std::string size_fmt = FormatSize(size);
+                std::string filesystem = "";
+
+                // Поиск ФС в разделах
+                if (node.contains("children") && node["children"].is_array()) {
+                    for (const auto &child: node["children"]) {
+                        if (child.value("class", "") == "volume" &&
+                            child.contains("configuration") && child["configuration"].is_object()) {
+                            filesystem = child["configuration"].value("filesystem", "");
+                            if (!filesystem.empty()) break;
+                            }
+                    }
+                }
+
+                summary_.storage.push_back(
+                    logicalname + ": " + product + ", " + vendor + ", " + serial + ", " +
+                    size_fmt + ", SCSI Disk, " + filesystem);
+            }
+        }
+        // === USB Generic Devices (токены, смарт-карты и т.д.) ===
+        else if (cls == "generic" && node.value("id", "").find("usb") != std::string::npos) {
+            std::string product = node.value("product", "");
+            std::string vendor = node.value("vendor", "");
+            std::string desc = node.value("description", "");
+
+            if (!product.empty() && !vendor.empty()) {
+                std::string speed = "";
+                if (node.contains("configuration") && node["configuration"].is_object()) {
+                    speed = node["configuration"].value("speed", "");
+                }
+
+                // Формат: "Product, Vendor, Version, Speed, Description"
+                summary_.usb.push_back(product + ", " + vendor + ", USB 2.0, " + speed + ", " + desc);
             }
         }
 
